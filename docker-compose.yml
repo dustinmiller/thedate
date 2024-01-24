@@ -1,0 +1,46 @@
+---
+version: "3.7"
+
+services:
+  thedate:
+    build: .
+    container_name: thedate
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.thedate.entrypoints=websecure
+      - traefik.http.routers.thedate.rule=Host(`${DOMAIN}`)
+      - traefik.http.routers.thedate.tls.certresolver=letsencrypt
+      - traefik.http.routers.thedate-http.entrypoints=web
+      - traefik.http.routers.thedate-http.rule=Host(`${DOMAIN}`)
+      - traefik.http.routers.thedate-http.middlewares=thedate-https
+      - traefik.http.middlewares.thedate-https.redirectscheme.scheme=https
+      - traefik.http.routers.thedate.tls=true
+
+  traefik:
+    image: traefik:latest
+    container_name: traefik
+    command:
+      # Globals
+      - --log.level=ERROR
+      - --api=false
+      - --global.sendAnonymousUsage=false
+      # Docker
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --providers.docker.endpoint=unix:///var/run/docker.sock
+      # Entrypoints
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+      # LetsEncrypt
+      - --certificatesresolvers.letsencrypt.acme.email=${CF_API_EMAIL}
+      - --certificatesresolvers.letsencrypt.acme.dnschallenge.provider=cloudflare
+      - --certificatesresolvers.letsencrypt.acme.storage=/etc/traefik/acme.json
+    ports:
+      - 80:80
+      - 443:443
+    environment:
+      - CF_API_EMAIL=${CF_API_EMAIL}
+      - CF_API_KEY=${CF_API_KEY}
+    volumes:
+      - /docker/volumes/traefik/acme.json:/etc/traefik/acme.json
+      - /var/run/docker.sock:/var/run/docker.sock:ro

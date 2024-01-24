@@ -1060,7 +1060,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "thenow-rs"
+name = "thedate"
 version = "0.1.0"
 dependencies = [
  "actix-web",

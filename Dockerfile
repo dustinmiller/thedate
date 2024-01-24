@@ -14,4 +14,6 @@ RUN apk add --no-cache libgcc
 
 COPY --from=builder /usr/src/thedate/target/release/thedate /usr/local/bin/thedate
 
+EXPOSE 8080
+
 CMD ["thedate"]
