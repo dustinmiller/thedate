@@ -7,14 +7,15 @@ services:
     container_name: thedate
     labels:
       - traefik.enable=true
-      - traefik.http.routers.thedate.entrypoints=websecure
+      # http
+      - traefik.http.routers.thedate.entrypoints=web
       - traefik.http.routers.thedate.rule=Host(`${DOMAIN}`)
-      - traefik.http.routers.thedate.tls.certresolver=letsencrypt
-      - traefik.http.routers.thedate-http.entrypoints=web
-      - traefik.http.routers.thedate-http.rule=Host(`${DOMAIN}`)
-      - traefik.http.routers.thedate-http.middlewares=thedate-https
-      - traefik.http.middlewares.thedate-https.redirectscheme.scheme=https
-      - traefik.http.routers.thedate.tls=true
+      # https
+      - traefik.http.routers.thedate-secure.entrypoints=websecure
+      - traefik.http.routers.thedate-secure.rule=Host(`${DOMAIN}`)
+      - traefik.http.routers.thedate-secure.tls.certresolver=letsencrypt
+      - traefik.http.routers.thedate-secure.tls=true
+
 
   traefik:
     image: traefik:latest
@@ -22,7 +23,7 @@ services:
     command:
       # Globals
       - --log.level=ERROR
-      - --api=false
+      - --api=false # enable to add new domains
       - --global.sendAnonymousUsage=false
       # Docker
       - --providers.docker=true
@@ -44,3 +45,18 @@ services:
     volumes:
       - /docker/volumes/traefik/acme.json:/etc/traefik/acme.json
       - /var/run/docker.sock:/var/run/docker.sock:ro
+
+
+  watchtower:
+    container_name: watchtower
+    image: containrrr/watchtower:latest
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - WATCHTOWER_CLEANUP=true
+      - WATCHTOWER_DEBUG=true
+      - WATCHTOWER_POLL_INTERVAL=21600
+      - WATCHTOWER_LABEL_ENABLE=false
+      - WATCHTOWER_NOTIFICATIONS=gotify
+      - WATCHTOWER_NOTIFICATION_GOTIFY_URL=https://${GOTIFY}.${PDOMAIN}
+      - WATCHTOWER_NOTIFICATION_GOTIFY_TOKEN=${WATCHTOWER_GOTIFY_TOKEN}

@@ -1,5 +1,5 @@
 use actix_web::{web, App, HttpResponse, HttpServer, Responder};
-use chrono::{DateTime, Utc, Datelike, Timelike};
+use chrono::{DateTime, Utc, Datelike, Timelike, SecondsFormat};
 use serde::Serialize;
 
 #[derive(Serialize)]
@@ -22,6 +22,17 @@ struct Timestamp {
     am_pm_notation: String,
     quarter_of_the_year: u32,
     rfc2822_date_format: String,
+    rfc3339_date_format: String,
+    rfc3339_date_format_millis: String,
+    rfc3339_date_format_millis_z: String,
+    rfc3339_date_format_secs: String,
+    rfc3339_date_format_secs_z: String,
+    rfc3339_date_format_micros: String,
+    rfc3339_date_format_micros_z: String,
+    rfc3339_date_format_nanos: String,
+    rfc3339_date_format_nanos_z: String,
+    rfc3339_date_format_autosi: String,
+    rfc3339_date_format_autosi_z: String,
     iso_week_date_format: String,
     month_of_the_year: u32,
     hour_of_the_day: u32,
@@ -53,6 +64,17 @@ fn from_chrono(dt: DateTime<Utc>) -> Timestamp {
         am_pm_notation: dt.format("%p").to_string().to_lowercase(),
         quarter_of_the_year: (dt.month() - 1) / 3 + 1,
         rfc2822_date_format: dt.to_rfc2822(),
+        rfc3339_date_format: dt.to_rfc3339(),
+        rfc3339_date_format_millis: dt.to_rfc3339_opts(SecondsFormat::Millis, false),
+        rfc3339_date_format_millis_z: dt.to_rfc3339_opts(SecondsFormat::Millis, true),
+        rfc3339_date_format_secs: dt.to_rfc3339_opts(SecondsFormat::Secs, false),
+        rfc3339_date_format_secs_z: dt.to_rfc3339_opts(SecondsFormat::Secs, true),
+        rfc3339_date_format_micros: dt.to_rfc3339_opts(SecondsFormat::Micros, false),
+        rfc3339_date_format_micros_z: dt.to_rfc3339_opts(SecondsFormat::Micros, true),
+        rfc3339_date_format_nanos: dt.to_rfc3339_opts(SecondsFormat::Nanos, false),
+        rfc3339_date_format_nanos_z: dt.to_rfc3339_opts(SecondsFormat::Nanos, true),
+        rfc3339_date_format_autosi: dt.to_rfc3339_opts(SecondsFormat::AutoSi, false),
+        rfc3339_date_format_autosi_z: dt.to_rfc3339_opts(SecondsFormat::AutoSi, true),
         iso_week_date_format: dt.format("%G-W%V-%u").to_string(),
         month_of_the_year: dt.month(),
         hour_of_the_day: dt.hour(),
