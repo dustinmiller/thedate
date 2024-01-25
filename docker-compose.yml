@@ -23,7 +23,7 @@ services:
     command:
       # Globals
       - --log.level=ERROR
-      - --api=false # enable to add new domains
+      - --api=false
       - --global.sendAnonymousUsage=false
       # Docker
       - --providers.docker=true
