@@ -93,7 +93,7 @@ fn from_chrono(dt: DateTime<Utc>) -> Timestamp {
         rfc3339_date_format_nanos: dt.to_rfc3339_opts(SecondsFormat::Nanos, false),
         rfc3339_date_format_nanos_z: dt.to_rfc3339_opts(SecondsFormat::Nanos, true),
         rfc3339_date_format_autosi: dt.to_rfc3339_opts(SecondsFormat::AutoSi, false),
-        rfc3339_date_format_autosi_z: dt.to_rfc3339_opts(SecondsFormat::AutoSi, true    ),
+        rfc3339_date_format_autosi_z: dt.to_rfc3339_opts(SecondsFormat::AutoSi, true),
         iso_week_date_format: dt.format("%G-W%V-%u").to_string(),
         iso_year_week_format: dt.format("%G-W%V").to_string(),
         day_of_the_year: dt.ordinal(),
