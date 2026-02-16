@@ -137,11 +137,16 @@ async fn home() -> impl Responder {
     HttpResponse::Ok().json(from_chrono(Utc::now()))
 }
 
+async fn health_check() -> impl Responder {
+    HttpResponse::Ok().json(serde_json::json!({"status": "healthy"}))
+}
+
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     HttpServer::new(|| {
         App::new()
             .route("/", web::get().to(home))
+            .route("/health", web::get().to(health_check))
     })
     .bind("0.0.0.0:8080")?
     .run()
