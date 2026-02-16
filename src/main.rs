@@ -40,7 +40,6 @@ struct Timestamp {
     iso_year_week_format: String,
     iso_year: i32,
     iso_week: u32,
-    // iso_week: String,
     weekday: String,
     weekday_short: String,
     week: String,
