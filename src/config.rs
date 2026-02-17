@@ -1,4 +1,5 @@
-  //! Configuration module for thedate service.
+
+//! Configuration module for thedate service.
 //!
 //! Handles reading configuration from environment variables with sensible defaults.
 

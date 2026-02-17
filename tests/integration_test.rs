@@ -40,10 +40,8 @@ mod helpers {
 // HTTP Endpoint Tests
 #[actix_web::test]
 async fn test_root_returns_200() {
-    let app = test::init_service(
-        App::new().route("/", actix_web::web::get().to(thedate::home)),
-    )
-    .await;
+    let app =
+        test::init_service(App::new().route("/", actix_web::web::get().to(thedate::home))).await;
 
     let req = test::TestRequest::get().uri("/").to_request();
     let resp = test::call_service(&app, req).await;
@@ -63,45 +61,80 @@ async fn test_all_61_fields_present() {
 
     // List all 61 expected fields from v0.3.3 for backward compatibility
     let expected_fields = vec![
-        "yyyy_mm_dd", "mm_dd_yyyy", "dd_mm_yyyy",
-        "yyyymmdd", "mmddyyyy", "ddmmyyyy",
-        "yyyymmdd_hyphenated", "mmddyyyy_hyphenated", "ddmmyyyy_hyphenated",
-        "week_number_of_the_year", "day_of_the_year", "unix_timestamp",
-        "military_time", "hh_mm_ss", "am_pm_notation",
-        "quarter_of_the_year", "rfc2822_date_format", "rfc3339_date_format",
-        "rfc3339_date_format_millis", "rfc3339_date_format_millis_z",
-        "rfc3339_date_format_secs", "rfc3339_date_format_secs_z",
-        "rfc3339_date_format_micros", "rfc3339_date_format_micros_z",
-        "rfc3339_date_format_nanos", "rfc3339_date_format_nanos_z",
-        "rfc3339_date_format_autosi", "rfc3339_date_format_autosi_z",
-        "iso_week_date_format", "month_of_the_year", "hour_of_the_day",
-        "minute_of_the_hour", "second_of_the_minute", "iso_year_week_format",
-        "iso_year", "iso_week", "weekday", "weekday_short", "week",
-        "timezone_name", "year_quad", "century_duo", "year_duo",
-        "month_number", "short_month", "long_month", "day_duo",
-        "easy_day", "abbrev_weekday", "weekday_index", "iso_weekday",
-        "us_week_num", "work_week_num", "iso_year_full", "iso_year_duo",
-        "iso_week_num", "julian_day", "mdy_format", "locale_date",
-        "full_iso", "verbose_date",
+        "yyyy_mm_dd",
+        "mm_dd_yyyy",
+        "dd_mm_yyyy",
+        "yyyymmdd",
+        "mmddyyyy",
+        "ddmmyyyy",
+        "yyyymmdd_hyphenated",
+        "mmddyyyy_hyphenated",
+        "ddmmyyyy_hyphenated",
+        "week_number_of_the_year",
+        "day_of_the_year",
+        "unix_timestamp",
+        "military_time",
+        "hh_mm_ss",
+        "am_pm_notation",
+        "quarter_of_the_year",
+        "rfc2822_date_format",
+        "rfc3339_date_format",
+        "rfc3339_date_format_millis",
+        "rfc3339_date_format_millis_z",
+        "rfc3339_date_format_secs",
+        "rfc3339_date_format_secs_z",
+        "rfc3339_date_format_micros",
+        "rfc3339_date_format_micros_z",
+        "rfc3339_date_format_nanos",
+        "rfc3339_date_format_nanos_z",
+        "rfc3339_date_format_autosi",
+        "rfc3339_date_format_autosi_z",
+        "iso_week_date_format",
+        "month_of_the_year",
+        "hour_of_the_day",
+        "minute_of_the_hour",
+        "second_of_the_minute",
+        "iso_year_week_format",
+        "iso_year",
+        "iso_week",
+        "weekday",
+        "weekday_short",
+        "week",
+        "timezone_name",
+        "year_quad",
+        "century_duo",
+        "year_duo",
+        "month_number",
+        "short_month",
+        "long_month",
+        "day_duo",
+        "easy_day",
+        "abbrev_weekday",
+        "weekday_index",
+        "iso_weekday",
+        "us_week_num",
+        "work_week_num",
+        "iso_year_full",
+        "iso_year_duo",
+        "iso_week_num",
+        "julian_day",
+        "mdy_format",
+        "locale_date",
+        "full_iso",
+        "verbose_date",
     ];
 
     assert_eq!(obj.len(), 61, "Expected exactly 61 fields");
 
     for field in expected_fields {
-        assert!(
-            obj.contains_key(field),
-            "Missing field: {}",
-            field
-        );
+        assert!(obj.contains_key(field), "Missing field: {}", field);
     }
 }
 
 #[actix_web::test]
 async fn test_content_type_is_json() {
-    let app = test::init_service(
-        App::new().route("/", actix_web::web::get().to(thedate::home)),
-    )
-    .await;
+    let app =
+        test::init_service(App::new().route("/", actix_web::web::get().to(thedate::home))).await;
 
     let req = test::TestRequest::get().uri("/").to_request();
     let resp = test::call_service(&app, req).await;
@@ -191,7 +224,11 @@ async fn test_week_number_in_valid_range() {
     let json = helpers::get_root().await;
     let week = json["week_number_of_the_year"].as_u64().unwrap();
 
-    assert!(week >= 1 && week <= 53, "Week number {} is out of range", week);
+    assert!(
+        (1..=53).contains(&week),
+        "Week number {} is out of range",
+        week
+    );
 }
 
 #[actix_web::test]
@@ -209,7 +246,7 @@ async fn test_month_in_valid_range() {
     let json = helpers::get_root().await;
     let month = json["month_of_the_year"].as_u64().unwrap();
 
-    assert!(month >= 1 && month <= 12, "Month {} is out of range", month);
+    assert!((1..=12).contains(&month), "Month {} is out of range", month);
 }
 
 #[actix_web::test]

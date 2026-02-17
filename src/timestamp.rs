@@ -2,7 +2,7 @@
 //!
 //! Provides comprehensive date/time formatting across 61+ different formats.
 
-use chrono::{DateTime, Utc, Datelike, Timelike, SecondsFormat};
+use chrono::{DateTime, Datelike, SecondsFormat, Timelike, Utc};
 use serde::Serialize;
 
 /// Comprehensive timestamp representation with 61+ format variants
@@ -200,7 +200,8 @@ mod tests {
 
     // Helper to create a test datetime
     fn test_dt(year: i32, month: u32, day: u32, hour: u32, min: u32, sec: u32) -> DateTime<Utc> {
-        Utc.with_ymd_and_hms(year, month, day, hour, min, sec).unwrap()
+        Utc.with_ymd_and_hms(year, month, day, hour, min, sec)
+            .unwrap()
     }
 
     // Format Correctness Tests
