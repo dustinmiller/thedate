@@ -24,6 +24,14 @@ repos:
         pass_filenames: false
         stages: [push]
 
+      - id: docker-build
+        name: docker build
+        entry: docker build -t thedate:test .
+        language: system
+        files: Dockerfile
+        pass_filenames: false
+        stages: [push]
+
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.5.0
     hooks:
