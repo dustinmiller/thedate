@@ -1,5 +1,5 @@
 # Build stage - use official Rust image
-FROM rust:1.85-alpine3.20 AS builder
+FROM rust:alpine3.20 AS builder
 
 # Install build dependencies
 RUN apk add --no-cache musl-dev
