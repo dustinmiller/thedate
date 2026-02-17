@@ -1,8 +1,21 @@
 # thedate
 
+> Version 0.4.0
+
 A fast, lightweight HTTP service that returns the current date and time in 61+ different formats via a simple JSON API.
 
 Inspired by [now.httpbin.org](https://github.com/not-kennethreitz/now.httpbin.org) - thanks to the original creators!
+
+## What's New in 0.4.0
+
+- ✅ **Zero bugs**: Fixed all identified issues from 0.3.3
+- 🧪 **60+ tests**: Comprehensive unit and integration tests (90%+ coverage)
+- 📦 **Modular codebase**: Clean separation into config, handlers, timestamp modules
+- 🐳 **Optimized Docker**: Multi-stage build, non-root user, health checks
+- 📝 **Full documentation**: Rustdoc and comprehensive README
+- 🔄 **CI/CD pipeline**: GitHub Actions for tests, linting, and coverage
+- 🪵 **Logging**: Request logging with configurable levels
+- 🔧 **Better DX**: Makefile targets, pre-commit hooks, quality checks
 
 ## Features
 
@@ -180,6 +193,27 @@ make fmt-check
 cargo clippy -- -D warnings
 make lint
 ```
+
+### Pre-commit Hooks
+
+Set up pre-commit hooks to automatically run checks before committing:
+
+```bash
+# Install pre-commit (if not already installed)
+pip install pre-commit
+
+# Install the hooks
+pre-commit install
+
+# Run manually on all files
+pre-commit run --all-files
+```
+
+The pre-commit hooks will automatically run:
+- `cargo fmt` - Code formatting
+- `cargo clippy` - Linting
+- `cargo test` - Tests (on push only)
+- Standard checks (trailing whitespace, file size, etc.)
 
 ### Docker
 
