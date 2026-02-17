@@ -131,3 +131,407 @@ pub fn from_chrono(dt: DateTime<Utc>) -> Timestamp {
         verbose_date: dt.format("%v").to_string(),
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use chrono::TimeZone;
+
+    // Helper to create a test datetime
+    fn test_dt(year: i32, month: u32, day: u32, hour: u32, min: u32, sec: u32) -> DateTime<Utc> {
+        Utc.with_ymd_and_hms(year, month, day, hour, min, sec).unwrap()
+    }
+
+    // Format Correctness Tests
+    #[test]
+    fn test_yyyy_mm_dd_format() {
+        let dt = test_dt(2024, 3, 15, 12, 30, 45);
+        let ts = from_chrono(dt);
+        assert_eq!(ts.yyyy_mm_dd, "2024_03_15");
+    }
+
+    #[test]
+    fn test_mm_dd_yyyy_format() {
+        let dt = test_dt(2024, 3, 15, 12, 30, 45);
+        let ts = from_chrono(dt);
+        assert_eq!(ts.mm_dd_yyyy, "03_15_2024");
+    }
+
+    #[test]
+    fn test_dd_mm_yyyy_format() {
+        let dt = test_dt(2024, 3, 15, 12, 30, 45);
+        let ts = from_chrono(dt);
+        assert_eq!(ts.dd_mm_yyyy, "15_03_2024");
+    }
+
+    #[test]
+    fn test_yyyymmdd_format() {
+        let dt = test_dt(2024, 3, 15, 12, 30, 45);
+        let ts = from_chrono(dt);
+        assert_eq!(ts.yyyymmdd, "20240315");
+    }
+
+    #[test]
+    fn test_hyphenated_formats() {
+        let dt = test_dt(2024, 3, 15, 12, 30, 45);
+        let ts = from_chrono(dt);
+        assert_eq!(ts.yyyymmdd_hyphenated, "2024-03-15");
+        assert_eq!(ts.mmddyyyy_hyphenated, "03-15-2024");
+        assert_eq!(ts.ddmmyyyy_hyphenated, "15-03-2024");
+    }
+
+    #[test]
+    fn test_military_time_format() {
+        let dt = test_dt(2024, 3, 15, 14, 30, 45);
+        let ts = from_chrono(dt);
+        assert_eq!(ts.military_time, "14:30");
+    }
+
+    #[test]
+    fn test_hh_mm_ss_format() {
+        let dt = test_dt(2024, 3, 15, 14, 30, 45);
+        let ts = from_chrono(dt);
+        assert_eq!(ts.hh_mm_ss, "14_30_45");
+    }
+
+    #[test]
+    fn test_am_pm_notation() {
+        let dt_am = test_dt(2024, 3, 15, 9, 30, 45);
+        let ts_am = from_chrono(dt_am);
+        assert_eq!(ts_am.am_pm_notation, "am");
+
+        let dt_pm = test_dt(2024, 3, 15, 14, 30, 45);
+        let ts_pm = from_chrono(dt_pm);
+        assert_eq!(ts_pm.am_pm_notation, "pm");
+    }
+
+    #[test]
+    fn test_quarter_calculation() {
+        let q1 = from_chrono(test_dt(2024, 1, 15, 12, 0, 0));
+        assert_eq!(q1.quarter_of_the_year, 1);
+
+        let q2 = from_chrono(test_dt(2024, 4, 15, 12, 0, 0));
+        assert_eq!(q2.quarter_of_the_year, 2);
+
+        let q3 = from_chrono(test_dt(2024, 7, 15, 12, 0, 0));
+        assert_eq!(q3.quarter_of_the_year, 3);
+
+        let q4 = from_chrono(test_dt(2024, 10, 15, 12, 0, 0));
+        assert_eq!(q4.quarter_of_the_year, 4);
+    }
+
+    #[test]
+    fn test_rfc2822_format() {
+        let dt = test_dt(2024, 3, 15, 12, 30, 45);
+        let ts = from_chrono(dt);
+        assert!(ts.rfc2822_date_format.contains("15 Mar 2024"));
+    }
+
+    #[test]
+    fn test_rfc3339_format() {
+        let dt = test_dt(2024, 3, 15, 12, 30, 45);
+        let ts = from_chrono(dt);
+        assert!(ts.rfc3339_date_format.starts_with("2024-03-15T12:30:45"));
+    }
+
+    #[test]
+    fn test_iso_week_date_format() {
+        let dt = test_dt(2024, 3, 15, 12, 30, 45);
+        let ts = from_chrono(dt);
+        // 2024-03-15 is a Friday (day 5) in week 11
+        assert!(ts.iso_week_date_format.starts_with("2024-W"));
+    }
+
+    #[test]
+    fn test_unix_timestamp() {
+        let dt = test_dt(1970, 1, 1, 0, 0, 0);
+        let ts = from_chrono(dt);
+        assert_eq!(ts.unix_timestamp, 0);
+
+        let dt2 = test_dt(2024, 1, 1, 0, 0, 0);
+        let ts2 = from_chrono(dt2);
+        assert_eq!(ts2.unix_timestamp, 1704067200); // 2024-01-01 00:00:00 UTC
+    }
+
+    #[test]
+    fn test_month_names() {
+        let dt = test_dt(2024, 3, 15, 12, 30, 45);
+        let ts = from_chrono(dt);
+        assert_eq!(ts.short_month, "Mar");
+        assert_eq!(ts.long_month, "March");
+    }
+
+    #[test]
+    fn test_weekday_formats() {
+        let dt = test_dt(2024, 3, 15, 12, 30, 45); // Friday
+        let ts = from_chrono(dt);
+        assert_eq!(ts.abbrev_weekday, "Fri");
+        assert_eq!(ts.weekday, "Friday");
+    }
+
+    #[test]
+    fn test_julian_day() {
+        let dt = test_dt(2024, 3, 15, 12, 30, 45);
+        let ts = from_chrono(dt);
+        assert_eq!(ts.julian_day, "075"); // March 15 is day 75 in leap year
+    }
+
+    #[test]
+    fn test_full_iso() {
+        let dt = test_dt(2024, 3, 15, 12, 30, 45);
+        let ts = from_chrono(dt);
+        assert_eq!(ts.full_iso, "2024-03-15");
+    }
+
+    #[test]
+    fn test_mdy_format() {
+        let dt = test_dt(2024, 3, 15, 12, 30, 45);
+        let ts = from_chrono(dt);
+        assert_eq!(ts.mdy_format, "03/15/24");
+    }
+
+    #[test]
+    fn test_year_formats() {
+        let dt = test_dt(2024, 3, 15, 12, 30, 45);
+        let ts = from_chrono(dt);
+        assert_eq!(ts.year_quad, "2024");
+        assert_eq!(ts.century_duo, "20");
+        assert_eq!(ts.year_duo, "24");
+    }
+
+    #[test]
+    fn test_day_formats() {
+        let dt = test_dt(2024, 3, 5, 12, 30, 45);
+        let ts = from_chrono(dt);
+        assert_eq!(ts.day_duo, "05");
+        assert_eq!(ts.easy_day.trim(), "5");
+    }
+
+    // Edge Case Tests
+    #[test]
+    fn test_leap_year_feb_29() {
+        let dt = test_dt(2024, 2, 29, 12, 0, 0);
+        let ts = from_chrono(dt);
+        assert_eq!(ts.yyyy_mm_dd, "2024_02_29");
+        assert_eq!(ts.julian_day, "060");
+    }
+
+    #[test]
+    fn test_year_end() {
+        let dt = test_dt(2023, 12, 31, 23, 59, 59);
+        let ts = from_chrono(dt);
+        assert_eq!(ts.yyyy_mm_dd, "2023_12_31");
+        assert_eq!(ts.day_of_the_year, 365);
+        assert_eq!(ts.month_of_the_year, 12);
+        assert_eq!(ts.quarter_of_the_year, 4);
+    }
+
+    #[test]
+    fn test_year_start() {
+        let dt = test_dt(2024, 1, 1, 0, 0, 0);
+        let ts = from_chrono(dt);
+        assert_eq!(ts.yyyy_mm_dd, "2024_01_01");
+        assert_eq!(ts.day_of_the_year, 1);
+        assert_eq!(ts.month_of_the_year, 1);
+        assert_eq!(ts.quarter_of_the_year, 1);
+        assert_eq!(ts.hour_of_the_day, 0);
+        assert_eq!(ts.minute_of_the_hour, 0);
+        assert_eq!(ts.second_of_the_minute, 0);
+    }
+
+    #[test]
+    fn test_epoch() {
+        let dt = test_dt(1970, 1, 1, 0, 0, 0);
+        let ts = from_chrono(dt);
+        assert_eq!(ts.unix_timestamp, 0);
+        assert_eq!(ts.yyyy_mm_dd, "1970_01_01");
+    }
+
+    #[test]
+    fn test_far_future() {
+        let dt = test_dt(2100, 12, 31, 23, 59, 59);
+        let ts = from_chrono(dt);
+        assert_eq!(ts.yyyy_mm_dd, "2100_12_31");
+        assert_eq!(ts.year_quad, "2100");
+    }
+
+    #[test]
+    fn test_week_53() {
+        // 2020 had 53 ISO weeks
+        let dt = test_dt(2020, 12, 31, 12, 0, 0);
+        let ts = from_chrono(dt);
+        assert_eq!(ts.week_number_of_the_year, 53);
+    }
+
+    #[test]
+    fn test_quarter_boundaries_q1_q2() {
+        let march = test_dt(2024, 3, 31, 23, 59, 59);
+        let ts_march = from_chrono(march);
+        assert_eq!(ts_march.quarter_of_the_year, 1);
+
+        let april = test_dt(2024, 4, 1, 0, 0, 0);
+        let ts_april = from_chrono(april);
+        assert_eq!(ts_april.quarter_of_the_year, 2);
+    }
+
+    #[test]
+    fn test_quarter_boundaries_q2_q3() {
+        let june = test_dt(2024, 6, 30, 23, 59, 59);
+        let ts_june = from_chrono(june);
+        assert_eq!(ts_june.quarter_of_the_year, 2);
+
+        let july = test_dt(2024, 7, 1, 0, 0, 0);
+        let ts_july = from_chrono(july);
+        assert_eq!(ts_july.quarter_of_the_year, 3);
+    }
+
+    #[test]
+    fn test_quarter_boundaries_q3_q4() {
+        let sept = test_dt(2024, 9, 30, 23, 59, 59);
+        let ts_sept = from_chrono(sept);
+        assert_eq!(ts_sept.quarter_of_the_year, 3);
+
+        let oct = test_dt(2024, 10, 1, 0, 0, 0);
+        let ts_oct = from_chrono(oct);
+        assert_eq!(ts_oct.quarter_of_the_year, 4);
+    }
+
+    #[test]
+    fn test_quarter_boundaries_q4_q1() {
+        let dec = test_dt(2024, 12, 31, 23, 59, 59);
+        let ts_dec = from_chrono(dec);
+        assert_eq!(ts_dec.quarter_of_the_year, 4);
+
+        let jan = test_dt(2025, 1, 1, 0, 0, 0);
+        let ts_jan = from_chrono(jan);
+        assert_eq!(ts_jan.quarter_of_the_year, 1);
+    }
+
+    #[test]
+    fn test_midnight() {
+        let dt = test_dt(2024, 3, 15, 0, 0, 0);
+        let ts = from_chrono(dt);
+        assert_eq!(ts.hour_of_the_day, 0);
+        assert_eq!(ts.military_time, "00:00");
+        assert_eq!(ts.am_pm_notation, "am");
+    }
+
+    #[test]
+    fn test_noon() {
+        let dt = test_dt(2024, 3, 15, 12, 0, 0);
+        let ts = from_chrono(dt);
+        assert_eq!(ts.hour_of_the_day, 12);
+        assert_eq!(ts.military_time, "12:00");
+        assert_eq!(ts.am_pm_notation, "pm");
+    }
+
+    #[test]
+    fn test_last_second_of_day() {
+        let dt = test_dt(2024, 3, 15, 23, 59, 59);
+        let ts = from_chrono(dt);
+        assert_eq!(ts.hour_of_the_day, 23);
+        assert_eq!(ts.minute_of_the_hour, 59);
+        assert_eq!(ts.second_of_the_minute, 59);
+    }
+
+    #[test]
+    fn test_all_months() {
+        for month in 1..=12 {
+            let dt = test_dt(2024, month, 15, 12, 0, 0);
+            let ts = from_chrono(dt);
+            assert_eq!(ts.month_of_the_year, month);
+            let expected_quarter = (month - 1) / 3 + 1;
+            assert_eq!(ts.quarter_of_the_year, expected_quarter);
+        }
+    }
+
+    // Field Consistency Tests
+    #[test]
+    fn test_week_number_consistency() {
+        let dt = test_dt(2024, 3, 15, 12, 30, 45);
+        let ts = from_chrono(dt);
+        // week_number_of_the_year and week should be consistent
+        assert_eq!(ts.week_number_of_the_year.to_string(), ts.week);
+    }
+
+    #[test]
+    fn test_iso_week_consistency() {
+        let dt = test_dt(2024, 3, 15, 12, 30, 45);
+        let ts = from_chrono(dt);
+        // iso_week and iso_week_num should be consistent
+        assert_eq!(ts.iso_week.to_string(), ts.iso_week_num);
+    }
+
+    #[test]
+    fn test_quarter_formula_consistency() {
+        for month in 1..=12 {
+            let dt = test_dt(2024, month, 15, 12, 0, 0);
+            let ts = from_chrono(dt);
+            let expected_quarter = (month - 1) / 3 + 1;
+            assert_eq!(ts.quarter_of_the_year, expected_quarter);
+        }
+    }
+
+    #[test]
+    fn test_weekday_short_matches_weekday() {
+        let dt = test_dt(2024, 3, 15, 12, 30, 45); // Friday
+        let ts = from_chrono(dt);
+        assert!(ts.weekday.starts_with(&ts.abbrev_weekday));
+    }
+
+    #[test]
+    fn test_numeric_values_in_range() {
+        let dt = test_dt(2024, 3, 15, 14, 30, 45);
+        let ts = from_chrono(dt);
+
+        assert!(ts.month_of_the_year >= 1 && ts.month_of_the_year <= 12);
+        assert!(ts.hour_of_the_day <= 23);
+        assert!(ts.minute_of_the_hour <= 59);
+        assert!(ts.second_of_the_minute <= 59);
+        assert!(ts.day_of_the_year >= 1 && ts.day_of_the_year <= 366);
+        assert!(ts.week_number_of_the_year >= 1 && ts.week_number_of_the_year <= 53);
+        assert!(ts.quarter_of_the_year >= 1 && ts.quarter_of_the_year <= 4);
+    }
+
+    #[test]
+    fn test_rfc_formats_parseable() {
+        let dt = test_dt(2024, 3, 15, 12, 30, 45);
+        let ts = from_chrono(dt);
+
+        // RFC 2822 should be parseable
+        DateTime::parse_from_rfc2822(&ts.rfc2822_date_format).expect("RFC 2822 should parse");
+
+        // RFC 3339 should be parseable
+        DateTime::parse_from_rfc3339(&ts.rfc3339_date_format).expect("RFC 3339 should parse");
+    }
+
+    #[test]
+    fn test_iso_year_consistency() {
+        let dt = test_dt(2024, 3, 15, 12, 30, 45);
+        let ts = from_chrono(dt);
+        assert_eq!(ts.iso_year.to_string(), ts.iso_year_full);
+    }
+
+    #[test]
+    fn test_month_number_matches_month_of_year() {
+        let dt = test_dt(2024, 3, 15, 12, 30, 45);
+        let ts = from_chrono(dt);
+        assert_eq!(ts.month_number, format!("{:02}", ts.month_of_the_year));
+    }
+
+    #[test]
+    fn test_hyphenated_and_underscore_formats_equivalent() {
+        let dt = test_dt(2024, 3, 15, 12, 30, 45);
+        let ts = from_chrono(dt);
+        assert_eq!(ts.yyyy_mm_dd.replace('_', "-"), ts.yyyymmdd_hyphenated);
+    }
+
+    #[test]
+    fn test_serialization_works() {
+        let dt = test_dt(2024, 3, 15, 12, 30, 45);
+        let ts = from_chrono(dt);
+        let json = serde_json::to_string(&ts).expect("Should serialize");
+        assert!(json.contains("yyyy_mm_dd"));
+        assert!(json.contains("2024"));
+    }
+}
