@@ -68,19 +68,30 @@ pub struct Timestamp {
 
 pub fn from_chrono(dt: DateTime<Utc>) -> Timestamp {
     Timestamp {
+        // Date formats (underscore-separated)
         yyyy_mm_dd: dt.format("%Y_%m_%d").to_string(),
         mm_dd_yyyy: dt.format("%m_%d_%Y").to_string(),
         dd_mm_yyyy: dt.format("%d_%m_%Y").to_string(),
+
+        // Date formats (no separator)
         yyyymmdd: dt.format("%Y%m%d").to_string(),
         mmddyyyy: dt.format("%m%d%Y").to_string(),
         ddmmyyyy: dt.format("%d%m%Y").to_string(),
+
+        // Date formats (hyphen-separated)
         yyyymmdd_hyphenated: dt.format("%Y-%m-%d").to_string(),
         mmddyyyy_hyphenated: dt.format("%m-%d-%Y").to_string(),
         ddmmyyyy_hyphenated: dt.format("%d-%m-%Y").to_string(),
+
+        // Time formats
         military_time: dt.format("%H:%M").to_string(),
         hh_mm_ss: dt.format("%H_%M_%S").to_string(),
         am_pm_notation: dt.format("%p").to_string().to_lowercase(),
+
+        // Calculated fields
         quarter_of_the_year: (dt.month() - 1) / 3 + 1,
+
+        // RFC formats
         rfc2822_date_format: dt.to_rfc2822(),
         rfc3339_date_format: dt.to_rfc3339(),
         rfc3339_date_format_millis: dt.to_rfc3339_opts(SecondsFormat::Millis, false),
@@ -93,8 +104,12 @@ pub fn from_chrono(dt: DateTime<Utc>) -> Timestamp {
         rfc3339_date_format_nanos_z: dt.to_rfc3339_opts(SecondsFormat::Nanos, true),
         rfc3339_date_format_autosi: dt.to_rfc3339_opts(SecondsFormat::AutoSi, false),
         rfc3339_date_format_autosi_z: dt.to_rfc3339_opts(SecondsFormat::AutoSi, true),
+
+        // ISO week formats
         iso_week_date_format: dt.format("%G-W%V-%u").to_string(),
         iso_year_week_format: dt.format("%G-W%V").to_string(),
+
+        // Numeric date/time components
         day_of_the_year: dt.ordinal(),
         month_of_the_year: dt.month(),
         week_number_of_the_year: dt.iso_week().week(),
@@ -104,26 +119,44 @@ pub fn from_chrono(dt: DateTime<Utc>) -> Timestamp {
         second_of_the_minute: dt.second(),
         iso_year: dt.year(),
         iso_week: dt.iso_week().week(),
+
+        // Weekday formats
         weekday_short: dt.weekday().to_string(),
         week: dt.iso_week().week().to_string(),
+
+        // Timezone
         timezone_name: dt.format("%Z").to_string(),
+
+        // Year components
         year_quad: dt.format("%Y").to_string(),
         century_duo: dt.format("%C").to_string(),
         year_duo: dt.format("%y").to_string(),
+
+        // Month components
         month_number: dt.format("%m").to_string(),
         short_month: dt.format("%b").to_string(),
         long_month: dt.format("%B").to_string(),
+
+        // Day components
         day_duo: dt.format("%d").to_string(),
         easy_day: dt.format("%e").to_string(),
+
+        // Weekday names
         abbrev_weekday: dt.format("%a").to_string(),
         weekday: dt.format("%A").to_string(),
+
+        // Weekday numbers
         weekday_index: dt.format("%w").to_string(),
         iso_weekday: dt.format("%u").to_string(),
+
+        // Week numbers
         us_week_num: dt.format("%U").to_string(),
         work_week_num: dt.format("%W").to_string(),
         iso_year_full: dt.format("%G").to_string(),
         iso_year_duo: dt.format("%g").to_string(),
         iso_week_num: dt.format("%V").to_string(),
+
+        // Miscellaneous formats
         julian_day: dt.format("%j").to_string(),
         mdy_format: dt.format("%D").to_string(),
         locale_date: dt.format("%x").to_string(),
