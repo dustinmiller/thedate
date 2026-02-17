@@ -1,6 +1,14 @@
+//! Timestamp data structure and conversion functions.
+//!
+//! Provides comprehensive date/time formatting across 61+ different formats.
+
 use chrono::{DateTime, Utc, Datelike, Timelike, SecondsFormat};
 use serde::Serialize;
 
+/// Comprehensive timestamp representation with 61+ format variants
+///
+/// Contains the same moment in time expressed in many different
+/// date and time formats for maximum compatibility and utility.
 #[derive(Serialize)]
 pub struct Timestamp {
     yyyy_mm_dd: String,
@@ -66,6 +74,26 @@ pub struct Timestamp {
     verbose_date: String,
 }
 
+/// Convert a chrono DateTime to a Timestamp with all format variants
+///
+/// # Arguments
+///
+/// * `dt` - A `DateTime<Utc>` to convert
+///
+/// # Returns
+///
+/// A Timestamp struct containing the input time in 61+ different formats
+///
+/// # Examples
+///
+/// ```
+/// use chrono::{TimeZone, Utc};
+/// use thedate::timestamp::from_chrono;
+///
+/// let dt = Utc.with_ymd_and_hms(2024, 3, 15, 12, 30, 45).unwrap();
+/// let ts = from_chrono(dt);
+/// // ts now contains the timestamp in all 61+ formats
+/// ```
 pub fn from_chrono(dt: DateTime<Utc>) -> Timestamp {
     Timestamp {
         // Date formats (underscore-separated)
